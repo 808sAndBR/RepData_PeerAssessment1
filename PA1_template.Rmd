@@ -8,21 +8,44 @@ output:
 
 ## Loading and preprocessing the data
 ```{r}
-if(!file.exists('activity.zip')){
-    download.file('https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip',
-                  'activity.zip', method = 'curl')
+get_read <- function(link){
+    if(!file.exists('activity.zip')){
+        download.file(link, 'activity.zip', method = 'curl')
+    }
+    
+    if(!file.exists('activity.csv')){
+        unzip('activity.zip')
+    }
+    
+    read.csv('activity.csv')
+}    
+
+process <- function(data){
+    data$date <- as.Date(data$date)
+    return(data)
 }
 
-if(!file.exists('activity.csv')){
-    unzip('activity.zip')
-}
-
-activity_data <- read.csv('activity.csv')
+activity_data <- get_read('https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip')
+activity_data <- process(activity_data)
 ```
 
 
 ## What is mean total number of steps taken per day?
+```{r}
+library (dplyr)
+per_day <- function(data){
+    #group_by(data, date) %>%
+    #summarise(sum(steps,na.rm = TRUE))
+    grouped <- group_by(data, date)
+    summarise(grouped, sum(steps,na.rm = TRUE))
+}
 
+daily_steps <- per_day(activity_data)
+names(daily_steps) <- c('date', 'steps')
+
+plot(daily_steps$date,daily_steps$steps, type = 'h', xlab= 'Date', ylab = 'Steps')
+
+```
 
 
 ## What is the average daily activity pattern?
