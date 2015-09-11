@@ -126,3 +126,25 @@ The histogram is mostly affected by transfering a lot of days with NAs which wer
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
+
+```{r}
+library(ggplot2)
+
+filled$weekend <- 
+    weekdays(filled$date) == "Sunday" | 
+    weekdays(filled$date) == "Saturday"
+
+filled$wkdy_label <- ifelse(filled$weekend, "Weekend", "Weekday")
+
+avg_day_wkend <- function(data){
+    group_by(data, interval, wkdy_label) %>%
+        summarise(mean(steps,na.rm = TRUE))
+}
+
+wk_wkend <- avg_day_wkend(filled)
+names(wk_wkend)[3] <- 'steps'
+
+qplot(interval, steps, geom = "line", facets = wkdy_label ~ . , data= wk_wkend)
+
+```
+

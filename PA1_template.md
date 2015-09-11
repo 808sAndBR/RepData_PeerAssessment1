@@ -406,7 +406,31 @@ report_daily(filled_daily, 'median_steps')
 ## 60 2012-11-29      0.00000
 ## 61 2012-11-30     34.11321
 ```
-The histogram is mostly affected by transfering a lot of days with NAs which 
+The histogram is mostly affected by transfering a lot of days with NAs which were in the 0-5000 steps section to the most common 10,000 to 15,000 section. It appears that usually the phones woked all day without intermiten issues, so the only changes in the mean and median are to values that were previously 0, but now represent a more normal day.
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
+
+
+```r
+library(ggplot2)
+
+filled$weekend <- 
+    weekdays(filled$date) == "Sunday" | 
+    weekdays(filled$date) == "Saturday"
+
+filled$wkdy_label <- ifelse(filled$weekend, "Weekend", "Weekday")
+
+avg_day_wkend <- function(data){
+    group_by(data, interval, wkdy_label) %>%
+        summarise(mean(steps,na.rm = TRUE))
+}
+
+wk_wkend <- avg_day_wkend(filled)
+names(wk_wkend)[3] <- 'steps'
+
+qplot(interval, steps, geom = "line", facets = wkdy_label ~ . , data= wk_wkend)
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-5-1.png) 
+
