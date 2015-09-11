@@ -8,6 +8,7 @@ output:
 
 ## Loading and preprocessing the data
 ```{r}
+library(magrittr)
 get_read <- function(link){
     if(!file.exists('activity.zip')){
         download.file(link, 'activity.zip', method = 'curl')
@@ -25,35 +26,76 @@ process <- function(data){
     return(data)
 }
 
-activity_data <- get_read('https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip')
-activity_data <- process(activity_data)
+activity_data <- get_read('https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip') %>%
+    process()
 ```
 
 
 ## What is mean total number of steps taken per day?
-```{r}
+```{r message=FALSE}
 library (dplyr)
+
+# Create data frame of daily total, mean, and median steps
 per_day <- function(data){
-    #group_by(data, date) %>%
-    #summarise(sum(steps,na.rm = TRUE))
-    grouped <- group_by(data, date)
-    summarise(grouped, sum(steps,na.rm = TRUE))
+    group_by(data, date) %>%
+        summarise(sum(steps,na.rm = TRUE),
+                  mean(steps,na.rm = TRUE),
+                  median(steps,na.rm = TRUE))
 }
 
+# Call funtion to build df and set column names
 daily_steps <- per_day(activity_data)
-names(daily_steps) <- c('date', 'steps')
+names(daily_steps) <- c('date', 'total_steps','mean_steps', 'median_steps')
 
-plot(daily_steps$date,daily_steps$steps, type = 'h', xlab= 'Date', ylab = 'Steps')
+# Create histogram of total daily steps
+hist(daily_steps$total_steps, xlab= 'Date', ylab = 'Steps')
+
+# Report the daily values by column
+report_daily <- function(column){
+    daily_steps[c('date',column)] %>%
+        print(.,n=length(daily_steps$date))
+}
+
+
+# Call funtion to display mean and median
+#maybe come back and make pretty
+report_daily('mean_steps')
+report_daily('median_steps')
 
 ```
 
 
 ## What is the average daily activity pattern?
+```{r}
+# Create data frame of activity mean by interval
+avg_day <- function(data){
+    group_by(data, interval) %>%
+        summarise(mean(steps,na.rm = TRUE))
+}
 
+# Call function to get interval mean and name columns
+all_day <- avg_day(activity_data) 
+names(all_day) <- c('interval', 'mean_steps')
 
+# Create the plot
+with(all_day,
+     plot(interval,mean_steps, 
+          xlab="Interval", ylab= "Steps", 
+          main="Average Daily Activity Pattern", 
+          type="l"))
+
+# Find the max activity in a rather ugly way and add
+# a it to the chart
+max_active <- all_day[all_day$mean_steps ==
+                          max(all_day$mean_steps),]$interval
+abline(v = max_active,col="blue")
+```
 
 ## Imputing missing values
 
+```{r}
+
+```
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
