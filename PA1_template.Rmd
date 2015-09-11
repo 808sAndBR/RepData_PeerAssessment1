@@ -51,16 +51,16 @@ names(daily_steps) <- c('date', 'total_steps','mean_steps', 'median_steps')
 hist(daily_steps$total_steps, xlab= 'Date', ylab = 'Steps')
 
 # Report the daily values by column
-report_daily <- function(column){
-    daily_steps[c('date',column)] %>%
-        print(.,n=length(daily_steps$date))
+report_daily <- function(df, column){
+    df[c('date',column)] %>%
+        print(.,n=length(df$date))
 }
 
 
 # Call funtion to display mean and median
 #maybe come back and make pretty
-report_daily('mean_steps')
-report_daily('median_steps')
+report_daily(daily_steps,'mean_steps')
+report_daily(daily_steps, 'median_steps')
 
 ```
 
@@ -94,8 +94,35 @@ abline(v = max_active,col="blue")
 ## Imputing missing values
 
 ```{r}
+# Copy base data to work with
+filled <- activity_data
+
+# boolian for if steps are na
+nas <- is.na(filled$steps)
+
+# Get number of rows with missing values
+sum(nas)
+
+# Replace NA values with the matching interval mean calculated earlier
+filled[nas,]$steps <- 
+    match(filled[nas,]$interval, all_day$interval) %>%
+    all_day$mean_steps[.]
+
+# Call function from above to get sum, mean, and median per day
+filled_daily<-per_day(filled)
+names(filled_daily) <- c('date', 'total_steps','mean_steps', 'median_steps')
+
+# Create histogram of total daily steps
+hist(filled_daily$total_steps, xlab= 'Date', ylab = 'Steps', main = "Daily Steps after filling data")
+
+report_daily(filled_daily,'mean_steps')
+report_daily(filled_daily, 'median_steps')
+
+
+
 
 ```
+The histogram is mostly affected by transfering a lot of days with NAs which were in the 0-5000 steps section to the most common 10,000 to 15,000 section. It appears that usually the phones woked all day without intermiten issues, so the only changes in the mean and median are to values that were previously 0, but now represent a more normal day.
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
