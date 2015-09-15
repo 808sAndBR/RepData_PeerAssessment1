@@ -45,7 +45,7 @@ daily_steps <- per_day(activity_data)
 names(daily_steps) <- c('date', 'total_steps','mean_steps', 'median_steps')
 
 # Create histogram of total daily steps
-hist(daily_steps$total_steps, xlab= 'Date', ylab = 'Steps')
+hist(daily_steps$total_steps, xlab= 'Date', ylab = 'Steps', main = 'Daily total steps')
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-2-1.png) 
@@ -59,7 +59,6 @@ report_daily <- function(df, column){
 
 
 # Call funtion to display mean and median
-#maybe come back and make pretty
 report_daily(daily_steps,'mean_steps')
 ```
 
@@ -222,8 +221,7 @@ with(all_day,
           main="Average Daily Activity Pattern", 
           type="l"))
 
-# Find the max activity in a rather ugly way and add
-# a it to the chart
+# Find the max activity and add it to the chart
 max_active <- all_day[all_day$mean_steps ==
                           max(all_day$mean_steps),]$interval
 abline(v = max_active,col="blue")
@@ -238,7 +236,7 @@ abline(v = max_active,col="blue")
 # Copy base data to work with
 filled <- activity_data
 
-# boolian for if steps are na
+# boolian for if steps are na (they are illmatic)
 nas <- is.na(filled$steps)
 
 # Get number of rows with missing values
@@ -248,6 +246,8 @@ sum(nas)
 ```
 ## [1] 2304
 ```
+
+I decided that the most acurate way to fill the data would be to fill in each interval with the mean for intervals calulated earlier. This should give us a good representation of a normal day/interval when data is missing.
 
 ```r
 # Replace NA values with the matching interval mean calculated earlier
@@ -263,7 +263,7 @@ names(filled_daily) <- c('date', 'total_steps','mean_steps', 'median_steps')
 hist(filled_daily$total_steps, xlab= 'Date', ylab = 'Steps', main = "Daily Steps after filling data")
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-4-1.png) 
+![](PA1_template_files/figure-html/unnamed-chunk-5-1.png) 
 
 ```r
 report_daily(filled_daily,'mean_steps')
@@ -432,5 +432,5 @@ names(wk_wkend)[3] <- 'steps'
 qplot(interval, steps, geom = "line", facets = wkdy_label ~ . , data= wk_wkend)
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-5-1.png) 
+![](PA1_template_files/figure-html/unnamed-chunk-6-1.png) 
 

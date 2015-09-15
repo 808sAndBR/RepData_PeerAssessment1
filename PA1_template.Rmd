@@ -48,7 +48,7 @@ daily_steps <- per_day(activity_data)
 names(daily_steps) <- c('date', 'total_steps','mean_steps', 'median_steps')
 
 # Create histogram of total daily steps
-hist(daily_steps$total_steps, xlab= 'Date', ylab = 'Steps')
+hist(daily_steps$total_steps, xlab= 'Date', ylab = 'Steps', main = 'Daily total steps')
 
 # Report the daily values by column
 report_daily <- function(df, column){
@@ -58,7 +58,6 @@ report_daily <- function(df, column){
 
 
 # Call funtion to display mean and median
-#maybe come back and make pretty
 report_daily(daily_steps,'mean_steps')
 report_daily(daily_steps, 'median_steps')
 
@@ -84,8 +83,7 @@ with(all_day,
           main="Average Daily Activity Pattern", 
           type="l"))
 
-# Find the max activity in a rather ugly way and add
-# a it to the chart
+# Find the max activity and add it to the chart
 max_active <- all_day[all_day$mean_steps ==
                           max(all_day$mean_steps),]$interval
 abline(v = max_active,col="blue")
@@ -97,12 +95,15 @@ abline(v = max_active,col="blue")
 # Copy base data to work with
 filled <- activity_data
 
-# boolian for if steps are na
+# boolian for if steps are na (they are illmatic)
 nas <- is.na(filled$steps)
 
 # Get number of rows with missing values
 sum(nas)
+```
 
+I decided that the most acurate way to fill the data would be to fill in each interval with the mean for intervals calulated earlier. This should give us a good representation of a normal day/interval when data is missing.
+```{r}
 # Replace NA values with the matching interval mean calculated earlier
 filled[nas,]$steps <- 
     match(filled[nas,]$interval, all_day$interval) %>%
@@ -117,9 +118,6 @@ hist(filled_daily$total_steps, xlab= 'Date', ylab = 'Steps', main = "Daily Steps
 
 report_daily(filled_daily,'mean_steps')
 report_daily(filled_daily, 'median_steps')
-
-
-
 
 ```
 The histogram is mostly affected by transfering a lot of days with NAs which were in the 0-5000 steps section to the most common 10,000 to 15,000 section. It appears that usually the phones woked all day without intermiten issues, so the only changes in the mean and median are to values that were previously 0, but now represent a more normal day.
