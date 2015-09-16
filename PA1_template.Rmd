@@ -38,29 +38,25 @@ library (dplyr)
 # Create data frame of daily total, mean, and median steps
 per_day <- function(data){
     group_by(data, date) %>%
-        summarise(sum(steps,na.rm = TRUE),
-                  mean(steps,na.rm = TRUE),
-                  median(steps,na.rm = TRUE))
+        summarise(sum(steps,na.rm = TRUE))
 }
 
 # Call funtion to build df and set column names
 daily_steps <- per_day(activity_data)
-names(daily_steps) <- c('date', 'total_steps','mean_steps', 'median_steps')
+names(daily_steps) <- c('date', 'total_steps')
 
 # Create histogram of total daily steps
 hist(daily_steps$total_steps, xlab= 'Date', ylab = 'Steps', main = 'Daily total steps')
 
-# Report the daily values by column
-report_daily <- function(df, column){
-    df[c('date',column)] %>%
-        print(.,n=length(df$date))
-}
+```
 
-
-# Call funtion to display mean and median
-report_daily(daily_steps,'mean_steps')
-report_daily(daily_steps, 'median_steps')
-
+Mean:
+```{r}
+mean(daily_steps$total_steps)
+```
+Median:
+```{r}
+median(daily_steps$total_steps)
 ```
 
 
@@ -111,17 +107,24 @@ filled[nas,]$steps <-
 
 # Call function from above to get sum, mean, and median per day
 filled_daily<-per_day(filled)
-names(filled_daily) <- c('date', 'total_steps','mean_steps', 'median_steps')
+names(filled_daily) <- c('date', 'total_steps')
 
 # Create histogram of total daily steps
 hist(filled_daily$total_steps, xlab= 'Date', ylab = 'Steps', main = "Daily Steps after filling data")
-
-report_daily(filled_daily,'mean_steps')
-report_daily(filled_daily, 'median_steps')
-
 ```
-The histogram is mostly affected by transfering a lot of days with NAs which were in the 0-5000 steps section to the most common 10,000 to 15,000 section. It appears that usually the phones woked all day without intermiten issues, so the only changes in the mean and median are to values that were previously 0, but now represent a more normal day.
 
+Mean:
+```{r}
+mean(filled_daily$total_steps)
+```
+Median:
+```{r}
+median(filled_daily$total_steps)
+```
+
+The histogram is mostly affected by transfering a lot of days with NAs which were in the 0-5000 steps section to the most common 10,000 to 15,000 section. 
+
+The mean and median are both increased which makes sense with the daily totals being larger from filling in the missing data.  
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
